@@ -67,20 +67,31 @@ function ballMove() {
   ballX += BallSpeedX;
   ballY += BallSpeedY;
 
-  if (ballX < 0) {
+  if (ballX < 0 && BallSpeedX < 0.0) {
     BallSpeedX *= -1
   }
 
-  if (ballX > canvas.width) {
+  if (ballX > canvas.width && BallSpeedX > 0.0) {
     BallSpeedX *= -1
   }
 
-  if (ballY < 0) {
+  if (ballY < 0 && BallSpeedY < 0.0) {
     BallSpeedY *= -1
   }
 
   if (ballY > canvas.height) {
     resetCanvas();
+  }
+}
+
+function isBrickAtRowCol(col, row) {
+
+  if (col >= 0 && col < BRICK_COL &&
+    row >= 0 && row < BRICK_ROW) {
+    var brickIndex = colToArrayIndex(col, row);
+    return brickGrid[brickIndex];
+  } else {
+    return false;
   }
 }
 
@@ -91,7 +102,7 @@ function ballBrickHandle() {
 
   if (ballBrickCol >= 0 && ballBrickCol < BRICK_COL &&
     ballBrickRow >= 0 && ballBrickRow < BRICK_ROW) {
-    if (brickGrid[brickNumber]) {
+    if (isBrickAtRowCol(ballBrickCol, ballBrickRow)) {
       brickGrid[brickNumber] = false;
       bricksLeft--;
 
@@ -104,18 +115,14 @@ function ballBrickHandle() {
       var ballHitThreeBrickCorner = true;
 
       if (prevBrickCol != ballBrickCol) {
-        var adjacentBrickSide = colToArrayIndex(prevBrickCol, ballBrickRow);
-
-        if (brickGrid[adjacentBrickSide]) {
+        if (isBrickAtRowCol(prevBrickCol, ballBrickRow) === false) {
           BallSpeedX *= -1;
           ballHitThreeBrickCorner = false;
         }
       }
 
       if (prevBrickRow != ballBrickRow) {
-        var adjacentBrickSide = colToArrayIndex(ballBrickCol, prevBrickRow);
-
-        if (brickGrid[adjacentBrickSide]) {
+        if (isBrickAtRowCol(ballBrickCol, prevBrickRow) === false) {
           BallSpeedY *= -1;
           ballHitThreeBrickCorner = false;
         }

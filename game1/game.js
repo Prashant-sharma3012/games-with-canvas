@@ -40,13 +40,19 @@ window.onload = function onload() {
 
   var framesperSecond = 30;
   setInterval(updateAll, 1000 / framesperSecond);
-
+  brickReset();
+  //ballReset();
   canvas.addEventListener('mousemove', updateMousePos);
 }
 
-function resetCanvas() {
+function ballReset() {
   ballX = canvas.width / 2;
   ballY = canvas.height / 2;
+}
+
+function resetCanvas() {
+  brickReset();
+  ballReset();
 }
 
 function moveAll() {
@@ -71,6 +77,21 @@ function moveAll() {
 
   if (ballY > canvas.height) {
     resetCanvas();
+  }
+
+  var ballBrickCol = Math.floor(ballX / BRICK_W);
+  var ballBrickRow = Math.floor(ballY / BRICK_H);
+  var brickNumber = colToArrayIndex(ballBrickCol, ballBrickRow);
+
+  // we could have just checked if brick number is in the brick grid length
+  // but for a mooment ball goes out of canvas bounds and that
+  // will delete the brick on opposite side of grid
+  if (ballBrickCol >= 0 && ballBrickCol < BRICK_COL &&
+    ballBrickRow >= 0 && ballBrickRow < BRICK_ROW) {
+    if (brickGrid[brickNumber]) {
+      brickGrid[brickNumber] = false;
+      BallSpeedY *= -1
+    }
   }
 
   if (ballY > paddleTopEdgeY &&
@@ -98,10 +119,14 @@ function colorCircle(centerX, centerY, radius, fillColor) {
   canvasContext.fill();
 }
 
+function colToArrayIndex(col, row) {
+  return col + BRICK_COL * row;
+}
+
 function drawBricks() {
   for (j = 0; j < BRICK_ROW; j++) {
     for (let i = 0; i < BRICK_COL; i++) {
-      let brickNumber = i + (j * BRICK_COL);
+      let brickNumber = colToArrayIndex(i, j);
       if (brickGrid[brickNumber]) {
         colorRect(BRICK_W * i, BRICK_H * j, BRICK_W - BRICK_GAP, BRICK_H - BRICK_GAP, 'blue');
       }
@@ -114,12 +139,7 @@ function drawAll() {
   colorCircle(ballX, ballY, 10, 'white');
   colorRect(paddleX, canvas.height - PADDLE_DISTANCE_FROM_EDGE, PADDLE_WIDTH, PADDLE_THICKNESS, 'white');
 
-  brickReset();
   drawBricks();
-
-  var mouseBrickCol = mouseX / BRICK_W;
-  var mouseBrickRow = mouseY / BRICK_H;
-  colorText(mouseBrickCol + "," + mouseBrickRow, mouseX, mouseY, 'yellow');
 }
 
 function updateAll() {

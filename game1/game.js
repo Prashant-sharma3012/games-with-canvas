@@ -21,7 +21,12 @@ var mouseY;
 
 function brickReset() {
   bricksLeft = 0;
-  for (let i = 0; i < BRICK_COL * BRICK_ROW; i++) {
+
+  for (let i = 0; i < BRICK_COL * 3; i++) {
+    brickGrid[i] = false;
+  }
+
+  for (let i = 3 * BRICK_COL; i < BRICK_COL * BRICK_ROW; i++) {
     brickGrid[i] = true;
     bricksLeft++;
   }
@@ -44,7 +49,7 @@ window.onload = function onload() {
   var framesperSecond = 30;
   setInterval(updateAll, 1000 / framesperSecond);
   brickReset();
-  //ballReset();
+  ballReset();
   canvas.addEventListener('mousemove', updateMousePos);
 }
 
